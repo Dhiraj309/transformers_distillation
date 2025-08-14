@@ -1,28 +1,4 @@
 # 🧪 HF Distiller — Knowledge Distillation for Hugging Face Models
----
-
-license: mit
-language: python
-pretty\_name: HF Distiller
-author: Dhiraj309  # Your Hugging Face ID
-tags:
-
-* knowledge-distillation
-* transformers
-* huggingface
-* pytorch
-* student-model
-  datasets:
-* name: example-dataset
-  type: text
-  task\_categories:
-
-  * text-classification
-  * text-generation
-
----
-
-# 🧪 HF Distiller — Knowledge Distillation for Hugging Face Models
 
 ![HF Banner](https://huggingface.co/front/assets/huggingface_logo.svg)
 
