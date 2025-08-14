@@ -66,8 +66,8 @@ pip install -r requirements.txt
 ## 🏃 Quick Start
 
 ```python
-from hf_distiller.models import load_teacher, load_student
-from hf_distiller.trainer import DistillTrainer
+from transformers_distillation.models import load_teacher, load_student
+from transformers_distillation.trainer import DistillTrainer
 from transformers import AutoTokenizer, TrainingArguments
 from datasets import Dataset
 
