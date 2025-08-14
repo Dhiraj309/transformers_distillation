@@ -48,6 +48,11 @@ Knowledge Distillation (KD) compresses a large model into a smaller one by trans
 ## ⚡ Installation
 
 ```bash
+#Install transformers_distilattion (Recommended)
+pip install --no-deps git+https://github.com/Dhiraj309/transformers_distillation.git
+
+#OR
+
 # Clone repository
 git clone https://github.com/Dhiraj309/hf_distiller.git
 cd hf_distiller
