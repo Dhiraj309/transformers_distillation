@@ -106,43 +106,35 @@ class DistillationTrainer(Trainer):
             return inputs.get("labels", inputs["input_ids"])
 
 
-    def compute_loss(
-        self,
-        model,
-        inputs,
-        return_outputs=False,
-        **kwargs
-):
-        labels = self.prepare_labels(inputs)
-        student_outputs = model(**inputs)
-        student_logits = student_outputs.logits
+def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+    labels = self.prepare_labels(inputs)
 
-        # Compute LM loss (always)
-        loss_fct = torch.nn.CrossEntropyLoss()
-        lm_loss = loss_fct(
-            student_logits.view(-1, student_logits.size(-1)),
-            labels.view(-1)
-        )
+    student_outputs = model(**inputs)
+    student_logits = student_outputs.logits
 
-        # KD loss only during training
-        if self.teacher_model is not None and self.training:
-            with torch.no_grad():
-                teacher_outputs = self.teacher_model(**inputs)
-                teacher_logits = teacher_outputs.logits
+    loss_fct = torch.nn.CrossEntropyLoss()
+    lm_loss = loss_fct(
+        student_logits.view(-1, student_logits.size(-1)),
+        labels.view(-1)
+    )
 
-            kd_loss = F.kl_div(
-                input=F.log_softmax(student_logits / self.temperature, dim=-1),
-                target=F.softmax(teacher_logits / self.temperature, dim=-1),
-                reduction="batchmean"
-            ) * (self.temperature ** 2)
+    # KD loss only during training
+    if self.teacher_model is not None and model.training:
+        with torch.no_grad():
+            teacher_outputs = self.teacher_model(**inputs)
+            teacher_logits = teacher_outputs.logits
 
-            loss = self.kd_alpha * kd_loss + (1.0 - self.kd_alpha) * lm_loss
-        else:
-            # evaluation → only LM loss
-            loss = lm_loss
+        kd_loss = F.kl_div(
+            input=F.log_softmax(student_logits / self.temperature, dim=-1),
+            target=F.softmax(teacher_logits / self.temperature, dim=-1),
+            reduction="batchmean"
+        ) * (self.temperature ** 2)
 
-        return (loss, student_outputs) if return_outputs else loss
+        loss = self.kd_alpha * kd_loss + (1.0 - self.kd_alpha) * lm_loss
+    else:
+        loss = lm_loss
 
+    return (loss, student_outputs) if return_outputs else loss
     
 
 def DistillTrainer(
