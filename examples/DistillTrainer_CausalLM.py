@@ -100,7 +100,7 @@ trainer = DistillTrainer(
 trainer.train()
 
 # -------------------------------------------------------------------------
-# Optional: Evaluate Student
+# Optional: Evaluate Student (Requires Eval Dataset)
 # -------------------------------------------------------------------------
-results = trainer.evaluate()
-print("Evaluation results:", results)
+# results = trainer.evaluate()
+# print("Evaluation results:", results)

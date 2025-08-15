@@ -100,7 +100,14 @@ trainer = DistillTrainer(
 trainer.train()
 
 # -------------------------------------------------------------------------
+<<<<<<< HEAD
+# Optional: Evaluate Student (Requires Eval Dataset)
+# -------------------------------------------------------------------------
+# results = trainer.evaluate()
+# print("Evaluation results:", results)
+=======
 # Optional: Evaluate Student
 # -------------------------------------------------------------------------
 results = trainer.evaluate()
 print("Evaluation results:", results)
+>>>>>>> origin/main

@@ -83,33 +83,43 @@ class DistillationTrainer(Trainer):
 
         return shifted
 
-    def compute_loss(
-            self,
-            model,
-            inputs,
-            return_outputs = False,
-            **kwargs
-    ):
-        self.teacher_model.to(inputs["input_ids"].device)
-        labels = inputs.get("labels", inputs["input_ids"])
-
-        if self.task_type == TaskType.SEQ2SEQ_LM:
+    def prepare_labels(self, inputs):
+        """
+        Dynamically prepare labels based on task type
+        """
+        if self.task_type == TaskType.CAUSAL_LM:
+            return inputs.get("labels", inputs["input_ids"])
+        elif self.task_type == TaskType.MLM:
+            # Assume labels are already masked (MLM dataset)
+            return inputs.get("labels", inputs["input_ids"])
+        elif self.task_type == TaskType.SEQ2SEQ_LM:
+            labels = inputs.get("labels", inputs["input_ids"])
             if "decoder_input_ids" not in inputs:
                 inputs["decoder_input_ids"] = self.shift_tokens_right(
                     labels,
-                    model.config.pad_token_id,
-                    model.config.decoder_start_token_id
+                    self.model.config.pad_token_id,
+                    self.model.config.decoder_start_token_id
                 )
-        
-        student_outputs = model(**inputs)
-        student_logits = student_outputs.logits
+            return labels
+        else:
+            # fallback
+            return inputs.get("labels", inputs["input_ids"])
 
-        loss_fct = torch.nn.CrossEntropyLoss()
-        lm_loss = loss_fct(
-            student_logits.view(-1, student_logits.size(-1)),
-            labels.view(-1)
-        )
 
+def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+    labels = self.prepare_labels(inputs)
+
+    student_outputs = model(**inputs)
+    student_logits = student_outputs.logits
+
+    loss_fct = torch.nn.CrossEntropyLoss()
+    lm_loss = loss_fct(
+        student_logits.view(-1, student_logits.size(-1)),
+        labels.view(-1)
+    )
+
+    # KD loss only during training
+    if self.teacher_model is not None and model.training:
         with torch.no_grad():
             teacher_outputs = self.teacher_model(**inputs)
             teacher_logits = teacher_outputs.logits
@@ -119,13 +129,12 @@ class DistillationTrainer(Trainer):
             target=F.softmax(teacher_logits / self.temperature, dim=-1),
             reduction="batchmean"
         ) * (self.temperature ** 2)
-        
-        # loss = self.kd_alpha * kd_loss = (1.0 - self.kd_alpha) * lm_loss
-        kd_part = self.kd_alpha * kd_loss
-        lm_part = (1.0 - self.kd_alpha) * lm_loss
-        loss = kd_part + lm_part
 
-        return (loss, student_outputs) if return_outputs else loss
+        loss = self.kd_alpha * kd_loss + (1.0 - self.kd_alpha) * lm_loss
+    else:
+        loss = lm_loss
+
+    return (loss, student_outputs) if return_outputs else loss
     
 
 def DistillTrainer(
