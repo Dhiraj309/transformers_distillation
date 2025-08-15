@@ -139,7 +139,7 @@ We welcome contributions from the community, including:
 * Optimization for faster student training
 
 🔗 GitHub: [Dhiraj309](https://github.com/Dhiraj309)
-🔗 Hugging Face: [Dhiraj309](https://huggingface.co/Dhiraj309)
+🔗 Hugging Face: [dignity045](https://huggingface.co/dignity045)
 
 ---
 
