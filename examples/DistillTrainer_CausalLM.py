@@ -63,6 +63,7 @@ def tokenize(batch):
     return tokenizer(batch["text"], max_length=128, padding=True, truncation=True)
 
 tokenized_dataset = dataset.map(tokenize, remove_columns=["text"])
+eval_dataset = tokenized_dataset.select(range(1))
 
 # -------------------------------------------------------------------------
 # Step 6 — Training Arguments
@@ -102,5 +103,5 @@ trainer.train()
 # -------------------------------------------------------------------------
 # Optional: Evaluate Student (Requires Eval Dataset)
 # -------------------------------------------------------------------------
-# results = trainer.evaluate()
-# print("Evaluation results:", results)
+results = trainer.evaluate(eval_dataset = eval_dataset)
+print("Evaluation results:", results)
