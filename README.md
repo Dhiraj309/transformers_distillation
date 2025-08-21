@@ -54,8 +54,8 @@ pip install --no-deps git+https://github.com/Dhiraj309/transformers_distillation
 #OR
 
 # Clone repository
-git clone https://github.com/Dhiraj309/hf_distiller.git
-cd hf_distiller
+git clone https://github.com/Dhiraj309/transformers_distillation.git
+cd transformers_distillation.git
 
 # Install dependencies
 pip install -r requirements.txt
@@ -146,3 +146,4 @@ We welcome contributions from the community, including:
 ## 📜 License
 
 Released under the **MIT License** — free to use, modify, and distribute. See [LICENSE](LICENSE) for full terms.
+
